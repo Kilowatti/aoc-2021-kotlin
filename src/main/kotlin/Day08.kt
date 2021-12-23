@@ -23,40 +23,26 @@ fun main() {
     println(part2(input))   // 1046281
 }
 
-class Display (input : String) {
+class Display(input: String) {
 
-    companion object {
-        private val digits: Map<Int, Set<Char>> = mapOf(
-            0 to "abcefg".toSet(),
-            1 to "cf".toSet(),
-            2 to "acdeg".toSet(),
-            3 to "acdfg".toSet(),
-            4 to "bcdf".toSet(),
-            5 to "abdfg".toSet(),
-            6 to "abdefg".toSet(),
-            7 to "acf".toSet(),
-            8 to "abcdefg".toSet(),
-            9 to "abcdfg".toSet(),
-        )
-    }
+    /** Map of segment (in 'a'..'g') to possible mixed values (in 'a'..'g') */
+    private val segments: Map<Char, MutableSet<Char>> = ('a'..'g').associateWith { ('a'..'g').toMutableSet() }
 
-    private val segments : Map<Char, MutableSet<Char>> = ('a'..'g').associateWith { ('a'..'g').toMutableSet() }
-
+    /** Output value of the display */
     val output: Int
 
     init {
         val (mixed, outputs) = input.split(" | ", limit = 2)
+
+        // Sort out segments
         mixed.split(' ').forEach { addMixed(it) }
         calculateRemaining()
-        val map: Map<Char, Char> = segments.map { it.value.single() to it.key }.toMap()
+        val segmentMap: Map<Char, Char> = segments.map { it.value.single() to it.key }.toMap()
 
-        output = outputs.split(' ').map { outputDigit -> outputDigit.map { map[it] }.toSet() }.map { outputSet ->
-            var digit = -1
-            digits.forEach {
-                if (it.value == outputSet) digit = it.key
-            }
-            digit
-        }.joinToString("") { it.toString() }.toInt()
+        // Calculate output into a member value
+        output = outputs.split(' ').map { mixedDigit -> mixedDigit.map { segmentMap[it] }.toSet() }
+            .map { outputSegmentSet -> digits.filterValues { it == outputSegmentSet }.keys.single() }
+            .joinToString("") { it.toString() }.toInt()
     }
 
     private fun addMixed(value: String) {
@@ -87,5 +73,21 @@ class Display (input : String) {
                 }
             }
         } while (someRemoved)
+    }
+
+    companion object {
+        /** Map of digit (in 0..9) to segments (in 'a'..'g') */
+        private val digits: Map<Int, Set<Char>> = mapOf(
+            0 to "abcefg".toSet(),
+            1 to "cf".toSet(),
+            2 to "acdeg".toSet(),
+            3 to "acdfg".toSet(),
+            4 to "bcdf".toSet(),
+            5 to "abdfg".toSet(),
+            6 to "abdefg".toSet(),
+            7 to "acf".toSet(),
+            8 to "abcdefg".toSet(),
+            9 to "abcdfg".toSet(),
+        )
     }
 }

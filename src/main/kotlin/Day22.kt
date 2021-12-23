@@ -1,8 +1,8 @@
 import kotlin.math.max
 
 fun main() {
-    fun part1(input: List<String>): Int  {
-        val acceptedRange = -50 .. 50
+    fun part1(input: List<String>): Int {
+        val acceptedRange = -50..50
         val cubes = mutableSetOf<Triple<Int, Int, Int>>()
 
         input.forEach { line ->
@@ -61,7 +61,7 @@ fun IntRange.inRange(other: IntRange): Boolean {
     return this.first in other && this.last in other
 }
 
-fun IntRange.splitBy(other: IntRange) : Set<IntRange> {
+fun IntRange.splitBy(other: IntRange): Set<IntRange> {
     val xSet = mutableSetOf(this.first, this.last + 1)
     if (other.first in this) xSet.add(other.first)
     if (other.last in this) xSet.add(other.last + 1)
@@ -70,21 +70,21 @@ fun IntRange.splitBy(other: IntRange) : Set<IntRange> {
 
 class Cuboid(private val x: IntRange, private val y: IntRange, private val z: IntRange) {
 
-    private val totalVolume : Long =
+    private val totalVolume: Long =
         (x.last - x.first + 1).toLong() * (y.last - y.first + 1).toLong() * (z.last - z.first + 1).toLong()
 
     private val overlappingOffCuboids = mutableSetOf<Cuboid>()
 
     fun addOverlappingOffCuboid(other: Cuboid) {
-        val xRange = max(this.x.first, other.x.first) ..Integer.min(this.x.last, other.x.last)
-        val yRange = max(this.y.first, other.y.first) ..Integer.min(this.y.last, other.y.last)
-        val zRange = max(this.z.first, other.z.first) ..Integer.min(this.z.last, other.z.last)
+        val xRange = max(this.x.first, other.x.first)..Integer.min(this.x.last, other.x.last)
+        val yRange = max(this.y.first, other.y.first)..Integer.min(this.y.last, other.y.last)
+        val zRange = max(this.z.first, other.z.first)..Integer.min(this.z.last, other.z.last)
         if (xRange.last >= xRange.first && yRange.last >= yRange.first && zRange.last >= zRange.first) {
             overlappingOffCuboids.add(Cuboid(xRange, yRange, zRange))
         }
     }
 
-    fun getActualVolume() : Long {
+    fun getActualVolume(): Long {
         val subCuboids = mutableSetOf(this)
         this.overlappingOffCuboids.forEach { offCuboid ->
             // Split cuboid to pieces and take only ones that are not in the current offCuboid
@@ -96,7 +96,7 @@ class Cuboid(private val x: IntRange, private val y: IntRange, private val z: In
         return subCuboids.sumOf { it.totalVolume }
     }
 
-    private fun splitBy(other: Cuboid) : Set<Cuboid> {
+    private fun splitBy(other: Cuboid): Set<Cuboid> {
         val xRanges = this.x.splitBy(other.x)
         val yRanges = this.y.splitBy(other.y)
         val zRanges = this.z.splitBy(other.z)
